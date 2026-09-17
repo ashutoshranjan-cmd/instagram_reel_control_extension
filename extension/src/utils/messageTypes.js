@@ -1,0 +1,30 @@
+/**
+ * Central message types for Chrome extension communication
+ * (Content Script <-> Background Service Worker <-> Offscreen Document <-> Popup)
+ */
+
+export const MessageTypes = {
+  // Reel events
+  REEL_DETECTED: 'REEL_DETECTED',
+  REEL_CHANGED: 'REEL_CHANGED',
+
+  // Manual Trigger from Popup
+  MANUAL_IDENTIFY: 'MANUAL_IDENTIFY',
+
+  // Audio Capture & Fingerprinting
+  START_AUDIO_CAPTURE: 'START_AUDIO_CAPTURE',
+  AUDIO_CAPTURE_READY: 'AUDIO_CAPTURE_READY',
+  AUDIO_CAPTURE_COMPLETE: 'AUDIO_CAPTURE_COMPLETE',
+  AUDIO_CAPTURE_FAILED: 'AUDIO_CAPTURE_FAILED',
+  CANCEL_AUDIO_CAPTURE: 'CANCEL_AUDIO_CAPTURE',
+
+  // Recognition Status
+  RECOGNITION_STARTED: 'RECOGNITION_STARTED',
+  RECOGNITION_RESULT: 'RECOGNITION_RESULT',
+  RECOGNITION_ERROR: 'RECOGNITION_ERROR',
+
+  // Content Script Queries
+  GET_CURRENT_STATE: 'GET_CURRENT_STATE',
+  CURRENT_STATE_RESPONSE: 'CURRENT_STATE_RESPONSE'
+};
+
