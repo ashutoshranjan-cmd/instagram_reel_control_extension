@@ -20,7 +20,7 @@ export class ReelViewer {
       fullscreen: false,
       focus: false,
       details: true,
-      fit: 'cover', // Default to 'cover' so video immediately zooms to fill 100% of the screen
+      fit: 'auto', // Default to 'auto' so aspect ratio is automatically managed without clipping
       volume: 1,
       muted: false,
       shortcuts: true
@@ -292,6 +292,19 @@ export class ReelViewer {
     }
   }
 
+  updateAspect(video) {
+    if (!video) return;
+    if (this.state.fit === 'auto') {
+      // 16:9 1920x1080 display:
+      // Portrait / square reels (< 1.1 aspect): use 'contain' (100vh height, 0% cropped, all text visible)
+      // Landscape reels (>= 1.1 aspect): use 'cover' (fills 1920x1080 screen edge-to-edge)
+      const isPortrait = video.videoWidth && video.videoHeight ? (video.videoWidth / video.videoHeight < 1.1) : true;
+      document.documentElement.setAttribute('data-rs-fit', isPortrait ? 'contain' : 'cover');
+    } else {
+      document.documentElement.setAttribute('data-rs-fit', this.state.fit || 'auto');
+    }
+  }
+
   applyVideo(video) {
     if (!video?.isConnected) return;
 
@@ -322,6 +335,12 @@ export class ReelViewer {
     // Mark video as fullscreen video and attach click listener
     video.setAttribute('data-rs-fullscreen-video', 'true');
     this.activeVideoElement = video;
+
+    // Dynamically manage aspect ratio for this video
+    this.updateAspect(video);
+    if (!video.videoWidth || !video.videoHeight) {
+      video.addEventListener('loadedmetadata', () => this.updateAspect(video), { once: true });
+    }
 
     video.onclick = (e) => {
       if (this.state.cinema || this.state.fullscreen) {
@@ -490,7 +509,7 @@ export class ReelViewer {
     }
 
     document.documentElement.setAttribute('data-rs-cinema', '');
-    document.documentElement.setAttribute('data-rs-fit', this.state.fit || 'cover');
+    this.updateAspect(video);
 
     // 2. Hide sidebar, action buttons, overlays, and messenger
     this.hideSidebarAndOverlays(main);
@@ -556,10 +575,12 @@ export class ReelViewer {
       this.state.cinema = true;
       this.apply();
     } else if (action === 'fit') {
-      const allowed = ['contain', 'cover', 'zoom', 'ultra'];
-      this.state.fit = allowed.includes(value) ? value : 'cover';
+      const allowed = ['auto', 'contain', 'cover', 'zoom', 'ultra'];
+      this.state.fit = allowed.includes(value) ? value : 'auto';
       if (!this.state.cinema) this.state.cinema = true;
-      this.apply();
+      const targetVid = this.reel?.videoElement || document.querySelector('video');
+      this.updateAspect(targetVid);
+      this.emit();
     } else if (action === 'volume') {
       const volume = Math.max(0, Math.min(1, Number(value)));
       if (!Number.isFinite(volume)) return;

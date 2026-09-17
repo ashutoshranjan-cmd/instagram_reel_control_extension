@@ -15,6 +15,8 @@ export function ViewerControls({ viewer = {}, onAction, compact = false }) {
   const cycleFit = () => {
     const cycle = { contain: 'cover', cover: 'zoom', zoom: 'ultra', ultra: 'contain' };
     act('fit', cycle[viewer.fit] || 'cover');
+    const cycle = { auto: 'cover', cover: 'zoom', zoom: 'ultra', ultra: 'contain', contain: 'auto' };
+    act('fit', cycle[viewer.fit] || 'auto');
   };
 
   return (
@@ -29,6 +31,7 @@ export function ViewerControls({ viewer = {}, onAction, compact = false }) {
         </button>
         <button className="rs-secondary" aria-pressed={viewer.fit !== 'contain'} onClick={cycleFit}>
           {viewer.fit === 'ultra' ? 'Zoom 1.6x' : viewer.fit === 'zoom' ? 'Zoom 1.35x' : viewer.fit === 'cover' ? 'Fill' : 'Fit'} video
+          {viewer.fit === 'ultra' ? 'Zoom 1.6x' : viewer.fit === 'zoom' ? 'Zoom 1.35x' : viewer.fit === 'cover' ? 'Fill' : viewer.fit === 'contain' ? 'Fit' : 'Auto'} video
         </button>
         <button className="rs-secondary" aria-pressed={!!viewer.focus} onClick={() => act('focus')}>
           {viewer.focus ? 'Exit focus' : 'Focus mode'}
@@ -115,6 +118,8 @@ export function ViewerHUD({ viewer = {}, onAction, onAnalyze, busy, song }) {
   const cycleZoom = () => {
     const cycle = { contain: 'cover', cover: 'zoom', zoom: 'ultra', ultra: 'contain' };
     onAction('fit', cycle[viewer.fit] || 'cover');
+    const cycle = { auto: 'cover', cover: 'zoom', zoom: 'ultra', ultra: 'contain', contain: 'auto' };
+    onAction('fit', cycle[viewer.fit] || 'auto');
   };
 
   return (
@@ -144,6 +149,7 @@ export function ViewerHUD({ viewer = {}, onAction, onAnalyze, busy, song }) {
         </button>
         <button onClick={() => onAction('next')} aria-label="Next reel">↓</button>
         <button onClick={cycleZoom} title="Toggle Zoom / Fill / Fit modes">
+        <button onClick={cycleZoom} title="Toggle Auto Aspect / Fill / Zoom / Fit modes">
           {viewer.fit === 'ultra'
             ? '🔍 Zoom 1.6x'
             : viewer.fit === 'zoom'
@@ -151,6 +157,9 @@ export function ViewerHUD({ viewer = {}, onAction, onAnalyze, busy, song }) {
             : viewer.fit === 'cover'
             ? '↔ Fill Screen'
             : '⛶ Fit Video'}
+            : viewer.fit === 'contain'
+            ? '⛶ Fit Video'
+            : '✨ Auto Aspect'}
         </button>
         <button onClick={() => onAction('fullscreen')} aria-label={viewer.fullscreen ? 'Exit fullscreen' : 'Fullscreen'}>
           {viewer.fullscreen ? 'Exit ⛶' : '⛶ Fullscreen'}
